@@ -1,5 +1,5 @@
 # hackernews-node
-🧠 Mostly a refresher on graphql &amp; Learning more Node
+⚡ Mostly a refresher on graphql &amp; Learning more Node
 
 <img src="https://camo.githubusercontent.com/37795238926c62ec185f204758c8b4b0d25c0e6182623e8d624fb3666608840c/68747470733a2f2f696d6775722e636f6d2f6c49693459725a2e706e67">
 
