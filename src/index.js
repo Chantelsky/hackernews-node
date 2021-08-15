@@ -1,31 +1,23 @@
 const { ApolloServer } = require('apollo-server');
-// 1 - adding a new integer variable that serves as a very rudimentary way to generate unique IDs for newly created Link elements.
-let links = [
-  {
-    id: 'link-0',
-    url: 'www.howtographql.com',
-    description: 'Fullstack tutorial for GraphQL',
-  },
-];
+// can attach an instance of PrismaClient to the context when the graphql server is being initalized
+const { PrismaClient } = require('@prisma/client');
 
-// 1 adding a new integer variable that simply serves as a very rudimentary way to generate unique IDs for newly created Link elements.
 const resolvers = {
   Query: {
     info: () => `This is the API of a Hackernews Clone`,
-    feed: () => links,
+    feed: () => async (parent, args, context) => {
+      return context.prisma.links.findMany();
+    },
   },
   Mutation: {
-    // 2  implementation of the post resolver first creates a new link object, then adds it to the existing links list and finally returns the new link.
-    post: (parent, args) => {
-      let idCount = links.length;
-
-      const link = {
-        id: `link-${idCount++}`,
-        description: args.description,
-        url: args.url,
-      };
-      links.push(link);
-      return link;
+    post: (parent, args, context, info) => {
+      const newLink = context.prisma.links.create({
+        data: {
+          url: args.url,
+          description: args.description,
+        },
+      });
+      return newLink;
     },
   },
 };
@@ -33,9 +25,14 @@ const resolvers = {
 const fs = require('fs');
 const path = require('path');
 
+const prisma = new PrismaClient();
+
 const server = new ApolloServer({
   typeDefs: fs.readFileSync(path.join(__dirname, 'schema.graphql'), 'utf8'),
   resolvers,
+  context: {
+    prisma,
+  },
 });
 
 server.listen().then(({ url }) => console.log(`Server is running on ${url}`));
